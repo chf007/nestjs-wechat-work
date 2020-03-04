@@ -1,0 +1,90 @@
+{
+  "name": "nestjs-wechat-work",
+  "version": "1.0.0",
+  "description": "NestJS Module for WeChat Work",
+  "author": "chf007 <chf007server@163.com>",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "main": "dist/index.js",
+  "files": [
+    "dist/**/*",
+    "*.md"
+  ],
+  "scripts": {
+    "start:dev": "tsc -w",
+    "build": "rm -rf dist && tsc",
+    "prepare": "npm run build",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "tslint -p tsconfig.json -c tslint.json",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:e2e": "jest --config ./test/jest-e2e.json"
+  },
+  "keywords": [
+    "nestjs",
+    "WeChat Work",
+    "API"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chf007/nestjs-wechat-work"
+  },
+  "bugs": "https://github.com/chf007/nestjs-wechat-work",
+  "peerDependencies": {
+    "@nestjs/common": "^6.8.0",
+    "@nestjs/core": "^6.8.0"
+  },
+  "dependencies": {
+    "lodash": "^4.17.15"
+  },
+  "devDependencies": {
+    "@nestjs/common": "^6.8.3",
+    "@nestjs/core": "^6.8.3",
+    "@nestjs/graphql": "^6.5.3",
+    "@nestjs/platform-express": "^6.8.3",
+    "@nestjs/testing": "6.1.1",
+    "@types/express": "4.16.1",
+    "@types/jest": "24.0.11",
+    "@types/lodash": "^4.14.149",
+    "@types/node": "11.13.4",
+    "@types/supertest": "2.0.7",
+    "apollo-server-express": "^2.9.14",
+    "circular-json": "^0.5.9",
+    "class-transformer": "^0.2.3",
+    "class-validator": "^0.11.0",
+    "cookie-parser": "^1.4.4",
+    "express": "^4.17.1",
+    "lodash": "^4.17.15",
+    "moment": "^2.24.0",
+    "query-string": "^6.9.0",
+    "jest": "24.7.1",
+    "prettier": "1.17.0",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^6.5.4",
+    "supertest": "4.0.2",
+    "ts-jest": "24.0.2",
+    "ts-node": "8.1.0",
+    "tsc-watch": "2.2.1",
+    "tsconfig-paths": "3.8.0",
+    "tslint": "5.16.0",
+    "typescript": "3.4.3"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src",
+    "testRegex": ".spec.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node"
+  }
+}
