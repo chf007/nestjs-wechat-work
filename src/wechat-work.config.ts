@@ -1,8 +1,18 @@
 export interface BaseConfig {
   corpId: string;
-  secret: string;
-  agentId: string;
-};
+  agentId?: string;
+  agentSecret?: string;
+  contactsSecret?: string;
+  telephoneSecret?: string;
+  scheduleSecret?: string;
+  customerSecret?: string;
+  attendanceAgentId?: string;
+  attendanceSecret?: string;
+  approvalAgentId?: string;
+  approvalSecret?: string;
+  hongbaoAgentId?: string;
+  hongbaoSecret?: string;
+}
 
 export interface AuthConfig {
   returnDomainName: string;
@@ -11,7 +21,7 @@ export interface AuthConfig {
   loginSuccPath?: string;
   loginFailPath?: string;
   noRedirectPath?: string;
-};
+}
 
 export class WechatWorkConfig {
   baseConfig: BaseConfig;

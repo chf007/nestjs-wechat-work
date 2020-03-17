@@ -1,17 +1,17 @@
-import { DynamicModule, Global, Module } from '@nestjs/common';
+import { DynamicModule, Global, Module, HttpModule } from '@nestjs/common';
 import { WechatWorkConfig } from './wechat-work.config';
-import { WechatWorkService } from './wechat-work.service';
+import { WechatWorkBaseService, WechatWorkContactsService } from './services';
 
 @Global()
 @Module({
-  imports: [],
-  providers: [WechatWorkService, WechatWorkConfig],
-  exports: [WechatWorkService, WechatWorkConfig],
+  imports: [HttpModule],
+  providers: [WechatWorkBaseService, WechatWorkContactsService, WechatWorkConfig],
+  exports: [WechatWorkBaseService, WechatWorkContactsService, WechatWorkConfig],
 })
-export class CtripApolloClientModule {
+export class WechatWorkModule {
   static register(config: WechatWorkConfig): DynamicModule {
     return {
-      module: CtripApolloClientModule,
+      module: WechatWorkModule,
       providers: [
         {
           provide: WechatWorkConfig,
