@@ -18,9 +18,12 @@ export interface AuthConfig {
   returnDomainName: string;
   loginPath?: string;
   logoutPath?: string;
-  loginSuccPath?: string;
+  loginSuccessPath?: string;
   loginFailPath?: string;
-  noRedirectPath?: string;
+  noRedirectPaths?: string[];
+  tokenName?: string;
+  tokenExpires?: number;
+  jwtSecret: string;
 }
 
 export class WechatWorkConfig {
