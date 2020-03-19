@@ -13,7 +13,7 @@ export class WechatWorkAuthService {
   }
 
   async validateContext(ctx: any) {
-    // 白名单逻辑，在白名单内的不需要进行登陆校验
+    // noRedirectPaths 开头的地址跳转控制权交给前端
     let isNoRedirectPath = false;
 
     for (const item of this.config.authConfig.noRedirectPaths) {
