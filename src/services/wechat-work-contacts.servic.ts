@@ -50,7 +50,6 @@ export class WechatWorkContactsService {
   }
 
   // 部门管理
-  
   async getDepartmentList(id: number): Promise<Result & WechatWorkData> {
     if (!id) {
       this.logger.log(`[getDepartmentList] userId cannot be empty`);
@@ -94,7 +93,5 @@ export class WechatWorkContactsService {
 
     return result.data;
   }
-
-
 
 }

@@ -12,7 +12,7 @@ export class WechatWorkAuthService {
     this.config = config;
   }
 
-  async validateContext(ctx: any) {
+  async validateContext(ctx: any): Promise<boolean> {
     // noRedirectPaths 开头的地址跳转控制权交给前端
     let isNoRedirectPath = false;
 
@@ -37,7 +37,7 @@ export class WechatWorkAuthService {
 
       if (!authorizationStr) {
         if (isNoRedirectPath) {
-          return false;
+          throw new HttpException('Not found token', HttpStatus.UNAUTHORIZED);
         } else {
           this.redirectWechatWorkQrCodePage(ctx);
         }
@@ -63,14 +63,15 @@ export class WechatWorkAuthService {
       }
     }
 
-    const user = await this.validateUserToken(token, ctx, isNoRedirectPath);
-    ctx.req.user = user;
+    ctx.req.user = await this.validateUserToken(token, ctx, isNoRedirectPath);
     return true;
   }
 
   /**
    * 验证token是否有效
    * @param token String
+   * @param ctx
+   * @param isNoRedirectPath
    */
   async validateUserToken(token: string, ctx: any, isNoRedirectPath: boolean) {
     try {
@@ -92,7 +93,7 @@ export class WechatWorkAuthService {
     }
   }
 
-  redirectWechatWorkQrCodePage(ctx: any) {
+  redirectWechatWorkQrCodePage(ctx: any): void {
     const { corpId, agentId } = this.config.baseConfig;
     const { returnDomainName, loginPath } = this.config.authConfig;
     ctx.redirect(
