@@ -26,7 +26,7 @@ export class WechatWorkAuthService {
     let token = '';
     // 先从cookie中取token
     const tokenName = this.config.authConfig.tokenName || DEFAULT_TOKEN_NAME;
-    const cookies = cookie.parse(ctx.req.headers.cookie);
+    const cookies = cookie.parse(ctx.req.headers.cookie || '');
     const tokenFromCookie = cookies[tokenName] || '';
 
     if (tokenFromCookie) {

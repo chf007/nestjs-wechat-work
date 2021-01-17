@@ -35,7 +35,7 @@ export class WechatWorkAuthMiddleware implements NestMiddleware {
         let userIdData;
         try {
           userIdData = await this.wechatWorkBaseService.getUserId(
-            req.query.code,
+            req.query.code as string,
           );
         } catch (err) {
           userIdData = {};
