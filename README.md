@@ -7,7 +7,7 @@
 
 > 多实例应用各自维护缓存，机器少的情况下应该不会超出企业微信 API 频率限制。如果机器数很多，说明业务搞大了，恭喜你，到时候请换用别的解决方案或者 fork 代码自行扩展功能，例如使用中心化服务或使用 redis 缓存。
 
-# 当前支持特性
+## 当前支持特性
 
 * WechatWorkBaseService 企业微信 API 基本服务，包括获取 accessToken，按扫码返回的 code 查询用户 ID  
 * WechatWorkContactsService 企业微信 API 通讯录服务，目前只支持成员信息查询、部门信息查询，其它暂未添加
@@ -28,6 +28,10 @@ npm install nestjs-wechat-work
 ```
 
 ## 使用
+
+### 导入 Module
+
+#### 同步配置方式
 
 ```
 // 导入 Module
@@ -72,6 +76,52 @@ import { WechatWorkModule } from 'nestjs-wechat-work';
 })
 export class AppModule {}
 
+```
+
+#### 异步配置方式
+
+适用于配置项从别的异步服务取得的场景
+
+```
+// 导入 Module
+import { Module } from '@nestjs/common';
+import { WechatWorkModule } from 'nestjs-wechat-work';
+
+@Module({
+  imports: [
+    WechatWorkModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        baseConfig: {
+          corpId: configService.get<string>('WECHAT_WORK_CORP_ID'), // 企业ID 必填
+          agentId: configService.get<string>('WECHAT_WORK_AGENT_ID'), // 自建应用ID
+          agentSecret: configService.get<string>('WECHAT_WORK_AGENT_SECRET'), // 自建应用secret
+          contactsSecret: configService.get<string>('WECHAT_WORK_CONTACTS_SECRET'), // 通讯录secret
+        },
+        authConfig: {
+          returnDomainName: configService.get<string>('WECHAT_WORK_RETURN_DOMAIN_NAME'), // 扫码回跳域名 必填
+          jwtSecret: configService.get<string>('WECHAT_WORK_JWT_SECRET'), // jwt secret 必填
+          loginPath: '/usm/api/login', // 登陆处理
+          logoutPath: '/usm/api/logout', // 登出处理
+          loginSuccessPath: '/usm/', // 登陆成功后跳转地址
+          loginFailPath: '/usm/login-fail', // 登陆失败后跳转地址，可以应用中自定义
+          noRedirectPaths: ['/usm/api/'], // 哪些开头的地址不直接跳转而是将控制权交给前端
+          tokenName: '_token', // token cookie name
+          tokenExpires: 3600 * 24 * 7, // token 过期秒数
+        },
+      }),
+      inject: [ConfigService],
+    }),
+  ],
+  providers: [],
+})
+export class AppModule {}
+
+```
+
+### 使用 Service
+
+```
 // 使用 Service
 import { Controller, Get, UseGuards, } from '@nestjs/common';
 import { WechatWorkBaseService, WechatWorkContactsService, } from 'nestjs-wechat-work';
@@ -85,7 +135,11 @@ export class SomeController {
     return await this.wechatWorkContactsService.getUserInfo('wechatwork userId');
   }
 }
+```
 
+### 使用 Guard
+
+```
 // 使用 WechatWorkAuthGuard
 import { Controller, Get, UseGuards, Req, Request, } from '@nestjs/common';
 import { WechatWorkBaseService, WechatWorkContactsService, WechatWorkAuthGuard } from 'nestjs-wechat-work';
@@ -100,7 +154,5 @@ export class SomeController {
     return await this.wechatWorkContactsService.getUserInfo(request.user.userId);
   }
 }
-
-
 ```
 

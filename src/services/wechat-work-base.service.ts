@@ -4,28 +4,27 @@ import {
   HttpService,
   HttpStatus,
   Logger,
+  Inject,
 } from '@nestjs/common';
-import { WechatWorkConfig } from '../wechat-work.config';
 import {
   AccessTokenInfo,
   Result,
   WechatWorkData,
   AgentType,
+  WechatWorkConfig,
 } from '../interfaces';
+import { WECHAT_WORK_MODULE_CONFIG } from '../constants';
 
 @Injectable()
 export class WechatWorkBaseService {
   private readonly logger = new Logger(WechatWorkBaseService.name);
-  public readonly config: WechatWorkConfig;
   private accessTokenInfo: AccessTokenInfo;
   public apiServer = 'https://qyapi.weixin.qq.com';
 
   constructor(
-    config: WechatWorkConfig,
+    @Inject(WECHAT_WORK_MODULE_CONFIG) private readonly config: WechatWorkConfig,
     private readonly httpService: HttpService,
-  ) {
-    this.config = config;
-  }
+  ) {}
 
   async getAccessToken(agentType: AgentType): Promise<string> {
     const {
@@ -41,30 +40,26 @@ export class WechatWorkBaseService {
     } = this.config.baseConfig;
 
     let secret = '';
-    // 优先使用通讯录secret
     if (agentType === AgentType.Custom) {
       secret = agentSecret;
     }
     if (agentType === AgentType.Contacts) {
-      secret = contactsSecret ? contactsSecret : agentSecret;
+      secret = contactsSecret;
     }
     if (agentType === AgentType.Telephone) {
       secret = telephoneSecret;
     }
-    // 优先使用日程secret 自建应用要先将自建应用配置到“可调用接口的应用”里
     if (agentType === AgentType.Schedule) {
-      secret = scheduleSecret ? scheduleSecret : agentSecret;
+      secret = scheduleSecret;
     }
-    // 优先使用外部联系人secret
     if (agentType === AgentType.Customer) {
-      secret = customerSecret ? customerSecret : agentSecret;
+      secret = customerSecret;
     }
     if (agentType === AgentType.Attendance) {
       secret = attendanceSecret;
     }
-    // 优先使用审批应用secret
     if (agentType === AgentType.Approval) {
-      secret = approvalSecret ? approvalSecret : agentSecret;
+      secret = approvalSecret;
     }
     if (agentType === AgentType.Hongbao) {
       secret = hongbaoSecret;

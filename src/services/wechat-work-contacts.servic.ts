@@ -4,27 +4,24 @@ import {
   HttpService,
   HttpStatus,
   Logger,
+  Inject,
 } from '@nestjs/common';
-import { WechatWorkConfig } from '../wechat-work.config';
-import { Result, WechatWorkData, AgentType } from '../interfaces';
+import { Result, WechatWorkData, AgentType, WechatWorkConfig } from '../interfaces';
 import { WechatWorkBaseService } from './wechat-work-base.service';
+import { WECHAT_WORK_MODULE_CONFIG } from '../constants';
 
 @Injectable()
 export class WechatWorkContactsService {
   private readonly logger = new Logger(WechatWorkContactsService.name);
-  public readonly config: WechatWorkConfig;
   public apiServer = 'https://qyapi.weixin.qq.com';
 
   constructor(
-    config: WechatWorkConfig,
+    @Inject(WECHAT_WORK_MODULE_CONFIG) private readonly config: WechatWorkConfig,
     private readonly httpService: HttpService,
     private readonly wechatWorkBaseService: WechatWorkBaseService,
-  ) {
-    this.config = config;
-  }
+  ) {}
 
   // 成员管理
-
   async getUserInfo(userId: string): Promise<Result & WechatWorkData> {
     if (!userId) {
       this.logger.log(`[getUserInfo] userId cannot be empty`);

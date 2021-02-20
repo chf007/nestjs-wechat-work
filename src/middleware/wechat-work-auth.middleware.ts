@@ -1,21 +1,20 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Inject, Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { sign } from 'jsonwebtoken';
 import * as queryString from 'query-string';
-import { WechatWorkConfig } from '../wechat-work.config';
 import { WechatWorkBaseService, WechatWorkContactsService } from '../services';
-import { DEFAULT_TOKEN_NAME, DEFAULT_TOKEN_EXPIRES } from '../constants';
-import { AuthFailResult } from '../interfaces';
+import { DEFAULT_TOKEN_NAME, DEFAULT_TOKEN_EXPIRES, WECHAT_WORK_MODULE_CONFIG } from '../constants';
+import { AuthFailResult, WechatWorkConfig } from '../interfaces';
 import { getPathById, flatten } from '../utils';
 
 @Injectable()
 export class WechatWorkAuthMiddleware implements NestMiddleware {
   constructor(
-    private readonly config: WechatWorkConfig,
+    @Inject(WECHAT_WORK_MODULE_CONFIG) private readonly config: WechatWorkConfig,
     private readonly wechatWorkBaseService: WechatWorkBaseService,
     private readonly wechatWorkContactsService: WechatWorkContactsService,
   ) {}
-  async use(req: Request, res: Response, next: Function) {
+  async use(req: Request, res: Response, next: () => void) {
     const { corpId, agentId } = this.config.baseConfig;
     const {
       returnDomainName,
@@ -29,7 +28,7 @@ export class WechatWorkAuthMiddleware implements NestMiddleware {
     } = this.config.authConfig;
     const loginFailPathObj = queryString.parseUrl(loginFailPath);
 
-    if (req.route.path === loginPath) {
+    if (req.baseUrl === loginPath) {
       // 如果当前请求是访问 loginPath，如传入code则校验企业微信用户信息如正确则生成jwt token，写入cookie，然后跳转至 loginSuccessPath，如失败则跳至 loginFailPath；如直接访问，则直接跳转至企业微信扫码页。
       if (req.query.code) {
         let userIdData;
@@ -108,7 +107,7 @@ export class WechatWorkAuthMiddleware implements NestMiddleware {
           );
         }
       }
-    } else if (req.route.path === logoutPath) {
+    } else if (req.baseUrl === logoutPath) {
       // 如果当前请求是访问 logoutPath，则清空 cookie 然后跳转至 loginSuccessPath。
       return res.clearCookie(tokenName).redirect(loginSuccessPath);
     } else {

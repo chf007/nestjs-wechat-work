@@ -1,3 +1,5 @@
+import { ModuleMetadata, Type } from '@nestjs/common/interfaces';
+
 export interface AccessTokenInfo {
   getTime: number;
   expiresIn: number;
@@ -30,4 +32,47 @@ export interface Result {
 
 export interface WechatWorkData {
   [key: string]: any;
+}
+
+export interface BaseConfig {
+  corpId: string;
+  agentId?: string;
+  agentSecret?: string;
+  contactsSecret?: string;
+  telephoneSecret?: string;
+  scheduleSecret?: string;
+  customerSecret?: string;
+  attendanceAgentId?: string;
+  attendanceSecret?: string;
+  approvalAgentId?: string;
+  approvalSecret?: string;
+  hongbaoAgentId?: string;
+  hongbaoSecret?: string;
+}
+
+export interface AuthConfig {
+  returnDomainName: string;
+  loginPath?: string;
+  logoutPath?: string;
+  loginSuccessPath?: string;
+  loginFailPath?: string;
+  noRedirectPaths?: string[];
+  tokenName?: string;
+  tokenExpires?: number;
+  jwtSecret: string;
+}
+
+export class WechatWorkConfig {
+  baseConfig: BaseConfig;
+  authConfig?: AuthConfig;
+}
+export interface WechatWorkConfigFactory {
+  createWechatWorkConfig(): Promise<WechatWorkConfig> | WechatWorkConfig;
+}
+
+export interface WechatWorkAsyncConfig extends Pick<ModuleMetadata, 'imports'> {
+  useExisting?: Type<WechatWorkConfigFactory>;
+  useClass?: Type<WechatWorkConfigFactory>;
+  useFactory?: (...args: any[]) => Promise<WechatWorkConfig> | WechatWorkConfig;
+  inject?: any[];
 }

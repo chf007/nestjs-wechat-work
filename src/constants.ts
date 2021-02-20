@@ -1,2 +1,3 @@
 export const DEFAULT_TOKEN_NAME = '_token';
 export const DEFAULT_TOKEN_EXPIRES = 3600 * 24 * 7;
+export const WECHAT_WORK_MODULE_CONFIG = 'WECHAT_WORK_MODULE_CONFIG';

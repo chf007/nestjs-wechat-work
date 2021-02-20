@@ -1,16 +1,13 @@
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger, Inject } from '@nestjs/common';
 import * as cookie from 'cookie';
 import { verify } from 'jsonwebtoken';
-import { WechatWorkConfig } from '../wechat-work.config';
-import { DEFAULT_TOKEN_NAME } from '../constants';
+import { WechatWorkConfig } from '../interfaces';
+import { DEFAULT_TOKEN_NAME, WECHAT_WORK_MODULE_CONFIG } from '../constants';
 
 @Injectable()
 export class WechatWorkAuthService {
   private readonly logger = new Logger(WechatWorkAuthService.name);
-  public readonly config: WechatWorkConfig;
-  constructor(config: WechatWorkConfig) {
-    this.config = config;
-  }
+  constructor(@Inject(WECHAT_WORK_MODULE_CONFIG) private readonly config: WechatWorkConfig) {}
 
   async validateContext(ctx: any): Promise<boolean> {
     // noRedirectPaths 开头的地址跳转控制权交给前端
