@@ -27,7 +27,7 @@ export class WechatWorkContactsService {
       this.logger.log(`[getUserInfo] userId cannot be empty`);
       throw new HttpException('[getUserInfo] userId cannot be empty', HttpStatus.BAD_REQUEST);
     }
-    const accessToken = await this.wechatWorkBaseService.getAccessToken(AgentType.Contacts);
+    const accessToken = await this.wechatWorkBaseService.getAccessToken(AgentType.Custom);
     const result = await this.httpService.get(
       `${this.apiServer}/cgi-bin/user/get?access_token=${accessToken}&userid=${userId}`
     ).toPromise();
@@ -52,7 +52,7 @@ export class WechatWorkContactsService {
       this.logger.log(`[getDepartmentList] userId cannot be empty`);
       throw new HttpException('[getDepartmentList] userId cannot be empty', HttpStatus.BAD_REQUEST);
     }
-    const accessToken = await this.wechatWorkBaseService.getAccessToken(AgentType.Contacts);
+    const accessToken = await this.wechatWorkBaseService.getAccessToken(AgentType.Custom);
     const result = await this.httpService.get(
       `${this.apiServer}/cgi-bin/department/list?access_token=${accessToken}&id=${id}`
     ).toPromise();
@@ -72,7 +72,7 @@ export class WechatWorkContactsService {
   }
 
   async getAllDepartmentList(): Promise<Result & WechatWorkData> {
-    const accessToken = await this.wechatWorkBaseService.getAccessToken(AgentType.Contacts);
+    const accessToken = await this.wechatWorkBaseService.getAccessToken(AgentType.Custom);
     const result = await this.httpService.get(
       `${this.apiServer}/cgi-bin/department/list?access_token=${accessToken}`
     ).toPromise();

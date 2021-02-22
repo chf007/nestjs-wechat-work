@@ -120,7 +120,7 @@ export class WechatWorkBaseService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    const accessToken = await this.getAccessToken(AgentType.Contacts);
+    const accessToken = await this.getAccessToken(AgentType.Custom);
     const result = await this.httpService
       .get(
         `${
