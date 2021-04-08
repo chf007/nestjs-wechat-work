@@ -3,9 +3,9 @@ import { Request, Response } from 'express';
 import { sign } from 'jsonwebtoken';
 import * as queryString from 'query-string';
 import { WechatWorkBaseService, WechatWorkContactsService } from '../services';
-import { DEFAULT_TOKEN_NAME, DEFAULT_TOKEN_EXPIRES, WECHAT_WORK_MODULE_CONFIG } from '../constants';
-import { AuthFailResult, WechatWorkConfig } from '../interfaces';
-import { getPathById, flatten } from '../utils';
+import { DEFAULT_TOKEN_EXPIRES, DEFAULT_TOKEN_NAME, WECHAT_WORK_MODULE_CONFIG } from '../constants';
+import { AuthFailResult, AuthType, WechatWorkConfig } from '../interfaces';
+import { flatten, getPathById } from '../utils';
 
 @Injectable()
 export class WechatWorkAuthMiddleware implements NestMiddleware {
@@ -17,6 +17,7 @@ export class WechatWorkAuthMiddleware implements NestMiddleware {
   async use(req: Request, res: Response, next: () => void) {
     const { corpId, agentId } = this.config.baseConfig;
     const {
+      type = AuthType.COOKIE,
       returnDomainName,
       loginPath,
       logoutPath,
@@ -90,11 +91,23 @@ export class WechatWorkAuthMiddleware implements NestMiddleware {
         const jwtToken = sign(userData, jwtSecret, {
           expiresIn: tokenExpires,
         });
-        return res.cookie(tokenName, jwtToken, {
-          httpOnly: true,
-          secure: false,
-          expires: new Date(Date.now() + tokenExpires * 1000),
-        }).redirect(loginSuccessPath);
+        if (type === AuthType.COOKIE) {
+          return res.cookie(tokenName, jwtToken, {
+            httpOnly: true,
+            secure: false,
+            expires: new Date(Date.now() + tokenExpires * 1000),
+          }).redirect(loginSuccessPath);
+        } else if (type === AuthType.CALLBACK_TOKEN) {
+          const parsedPath = queryString.parseUrl(loginSuccessPath, { parseFragmentIdentifier: true });
+          return res.redirect(queryString.stringifyUrl({
+            url: parsedPath.url,
+            query: {
+              ...parsedPath.query,
+              [tokenName]: jwtToken,
+            },
+            fragmentIdentifier: parsedPath.fragmentIdentifier,
+          }));
+        }
       } else {
         if (req.query.state) {
           loginFailPathObj.query.result = AuthFailResult.UserRejectQrCode;
@@ -108,8 +121,11 @@ export class WechatWorkAuthMiddleware implements NestMiddleware {
         }
       }
     } else if (req.baseUrl === logoutPath) {
-      // 如果当前请求是访问 logoutPath，则清空 cookie 然后跳转至 loginSuccessPath。
-      return res.clearCookie(tokenName).redirect(loginSuccessPath);
+      if (type === AuthType.COOKIE) {
+        // 如果当前请求是访问 logoutPath，则清空 cookie 然后跳转至 loginSuccessPath。
+        return res.clearCookie(tokenName).redirect(loginSuccessPath);
+      }
+      return res.redirect(loginSuccessPath);
     } else {
       next();
     }

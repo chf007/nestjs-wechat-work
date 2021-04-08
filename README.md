@@ -13,13 +13,22 @@
 * WechatWorkContactsService 企业微信 API 通讯录服务，目前只支持成员信息查询、部门信息查询，其它暂未添加
 * WechatWorkAuthGuard 企业微信身份验证守卫，在需要的 Controller 或方法上添加
 * WechatWorkAuthMiddleware 企业微信扫码登录中间件，按以下约定进行扫码登录流程：
-  * 分为页面路由和 API 路由，页面路由如果没有登录直接跳企业微信扫码页，API 路由如果没有登录只返回错误码，是否跳转由前端来决定
-  * noRedirectPaths 用来配置 API 路由规则，符合此规则的不直接跳企业微信扫码页，只返回错误码，是否跳转由前端来决定
-  * WechatWorkAuthMiddleware 中间件会监控 loginPath 路由，如传入 code 则校验企业微信用户信息，正确则生成 jwt token，写入 cookie，然后跳转至 loginSuccessPath，如失败则跳至 loginFailPath；如直接访问，则直接跳转至企业微信扫码页。
-  * loginSuccessPath 和 loginFailPath 对应的页面要自已实现。
-  * WechatWorkAuthMiddleware 中间件会监控 logoutPath 路由，如访问，则清空 cookie，跳转至 loginSuccessPath。前端不访问这个页面也可以自行清除 cookie 达到登出的效果。
-  * 会查询用户基本信息存储在 req 上下文中
-  * 身份验证使用 JsonWebToken 实现，一经签发，则在有效期内一直有效。
+  * COOKIE 模式：
+    * 分为页面路由和 API 路由，页面路由如果没有登录直接跳企业微信扫码页，API 路由如果没有登录只返回错误码，是否跳转由前端来决定
+    * noRedirectPaths 用来配置 API 路由规则，符合此规则的不直接跳企业微信扫码页，只返回错误码，是否跳转由前端来决定
+    * WechatWorkAuthMiddleware 中间件会监控 loginPath 路由，如传入 code 则校验企业微信用户信息，正确则生成 jwt token，写入 cookie，然后跳转至 loginSuccessPath，如失败则跳至 loginFailPath；如直接访问，则直接跳转至企业微信扫码页
+    * loginSuccessPath 和 loginFailPath 对应的页面要自已实现
+    * WechatWorkAuthMiddleware 中间件会监控 logoutPath 路由，如访问，则清空 cookie，跳转至 loginSuccessPath。前端不访问这个页面也可以自行清除 cookie 达到登出的效果
+    * 会查询用户基本信息存储在 req 上下文中
+    * 身份验证使用 JsonWebToken 实现，一经签发，则在有效期内一直有效
+  * CALLBACK_TOKEN 模式：
+    * 分为页面路由和 API 路由，页面路由如果没有登录直接跳企业微信扫码页，API 路由如果没有登录只返回错误码，是否跳转由前端来决定
+    * noRedirectPaths 用来配置 API 路由规则，符合此规则的不直接跳企业微信扫码页，只返回错误码，是否跳转由前端来决定
+    * WechatWorkAuthMiddleware 中间件会监控 loginPath 路由，如传入 code 则校验企业微信用户信息，正确则生成 jwt token，然后跳转至 `${loginSuccessPath}[?|&]${tokenName}=token`，如失败则跳至 loginFailPath；如直接访问，则直接跳转至企业微信扫码页
+    * loginSuccessPath 和 loginFailPath 对应的页面要自已实现，loginSuccessPath 的页面要处理 url 中返回的 token
+    * WechatWorkAuthMiddleware 中间件不处理 logoutPath 路由。前端自行清除 token 达到登出的效果
+    * 会查询用户基本信息存储在 req 上下文中
+    * 身份验证使用 JsonWebToken 实现，一经签发，则在有效期内一直有效
 
 ## 安装
 
@@ -57,6 +66,7 @@ import { WechatWorkModule } from 'nestjs-wechat-work';
         hongbaoSecret: 'string', // 企业红包secret
       },
       authConfig: {
+        type: 'COOKIE', // auth 模式：COOKIE | CALLBACK_TOKEN，默认为 'COOKIE'
         returnDomainName: 'https://admin.xxx.com', // 扫码回跳域名 必填
         jwtSecret: 'adsadsad', // jwt secret 必填
         loginPath: '/login', // 登陆处理
@@ -99,6 +109,7 @@ import { WechatWorkModule } from 'nestjs-wechat-work';
           contactsSecret: configService.get<string>('WECHAT_WORK_CONTACTS_SECRET'), // 通讯录secret
         },
         authConfig: {
+          type: 'COOKIE', // auth 模式：COOKIE | CALLBACK_TOKEN，默认为 'COOKIE'
           returnDomainName: configService.get<string>('WECHAT_WORK_RETURN_DOMAIN_NAME'), // 扫码回跳域名 必填
           jwtSecret: configService.get<string>('WECHAT_WORK_JWT_SECRET'), // jwt secret 必填
           loginPath: '/usm/api/login', // 登陆处理

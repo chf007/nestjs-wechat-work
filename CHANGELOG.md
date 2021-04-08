@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.1.0] - 2021-04-08
+### Added
+- 除 cookie 模式以外，支持 callback_token 模式以适应前后端分离场景
+
+### Changed
+- 无
+
 ## [1.0.5] - 2021-02-22
 ### Added
 - 增加 registerAsync 以支持异步配置

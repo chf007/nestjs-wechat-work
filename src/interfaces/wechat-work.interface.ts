@@ -6,6 +6,11 @@ export interface AccessTokenInfo {
   accessToken: string;
 }
 
+export enum AuthType {
+  COOKIE = 'COOKIE',
+  CALLBACK_TOKEN = 'CALLBACK_TOKEN',
+}
+
 export enum AgentType {
   Custom = 'Custom',
   Contacts = 'Contacts',
@@ -51,6 +56,7 @@ export interface BaseConfig {
 }
 
 export interface AuthConfig {
+  type?: AuthType;
   returnDomainName: string;
   loginPath?: string;
   logoutPath?: string;
