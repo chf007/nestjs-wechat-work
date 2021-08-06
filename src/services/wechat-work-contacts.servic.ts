@@ -21,7 +21,7 @@ export class WechatWorkContactsService {
     private readonly wechatWorkBaseService: WechatWorkBaseService,
   ) {}
 
-  // 成员管理
+  // 读取成员
   async getUserInfo(userId: string): Promise<Result & WechatWorkData> {
     if (!userId) {
       this.logger.log(`[getUserInfo] userId cannot be empty`);
@@ -29,7 +29,7 @@ export class WechatWorkContactsService {
     }
     const accessToken = await this.wechatWorkBaseService.getAccessToken(AgentType.Custom);
     const result = await this.httpService.get(
-      `${this.apiServer}/cgi-bin/user/get?access_token=${accessToken}&userid=${userId}`
+      `${this.apiServer}/cgi-bin/user/get?access_token=${accessToken}&userid=${userId}`,
     ).toPromise();
 
     if (result.data.errcode) {
@@ -46,7 +46,49 @@ export class WechatWorkContactsService {
     return result.data;
   }
 
-  // 部门管理
+  // 获取部门成员
+  async getSimpleUserList(departmentId: number = 1, fetchChild: number = 0): Promise<Result & WechatWorkData> {
+    const accessToken = await this.wechatWorkBaseService.getAccessToken(AgentType.Custom);
+    const result = await this.httpService.get(
+      `${this.apiServer}/cgi-bin/user/simplelist?access_token=${accessToken}&department_id=${departmentId}&fetch_child=${fetchChild}`,
+    ).toPromise();
+
+    if (result.data.errcode) {
+      this.logger.error(
+        `[getSimpleUserList] errcode: ${result.data.errcode}, errmsg: ${
+          result.data.errmsg
+        }`,
+      );
+      throw new HttpException(`[getSimpleUserList] errcode: ${result.data.errcode}, errmsg: ${
+        result.data.errmsg
+      }`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    return result.data;
+  }
+
+  // 获取部门成员详情
+  async getUserList(departmentId: number = 1, fetchChild: number = 0): Promise<Result & WechatWorkData> {
+    const accessToken = await this.wechatWorkBaseService.getAccessToken(AgentType.Custom);
+    const result = await this.httpService.get(
+      `${this.apiServer}/cgi-bin/user/list?access_token=${accessToken}&department_id=${departmentId}&fetch_child=${fetchChild}`,
+    ).toPromise();
+
+    if (result.data.errcode) {
+      this.logger.error(
+        `[getUserList] errcode: ${result.data.errcode}, errmsg: ${
+          result.data.errmsg
+        }`,
+      );
+      throw new HttpException(`[getUserList] errcode: ${result.data.errcode}, errmsg: ${
+        result.data.errmsg
+      }`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    return result.data;
+  }
+
+  // 获取部门列表
   async getDepartmentList(id: number): Promise<Result & WechatWorkData> {
     if (!id) {
       this.logger.log(`[getDepartmentList] userId cannot be empty`);
@@ -54,7 +96,7 @@ export class WechatWorkContactsService {
     }
     const accessToken = await this.wechatWorkBaseService.getAccessToken(AgentType.Custom);
     const result = await this.httpService.get(
-      `${this.apiServer}/cgi-bin/department/list?access_token=${accessToken}&id=${id}`
+      `${this.apiServer}/cgi-bin/department/list?access_token=${accessToken}&id=${id}`,
     ).toPromise();
 
     if (result.data.errcode) {
@@ -71,10 +113,11 @@ export class WechatWorkContactsService {
     return result.data;
   }
 
+  // 获取所有部门列表
   async getAllDepartmentList(): Promise<Result & WechatWorkData> {
     const accessToken = await this.wechatWorkBaseService.getAccessToken(AgentType.Custom);
     const result = await this.httpService.get(
-      `${this.apiServer}/cgi-bin/department/list?access_token=${accessToken}`
+      `${this.apiServer}/cgi-bin/department/list?access_token=${accessToken}`,
     ).toPromise();
 
     if (result.data.errcode) {

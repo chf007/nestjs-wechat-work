@@ -1,6 +1,6 @@
 {
   "name": "nestjs-wechat-work",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "NestJS Module for WeChat Work",
   "author": "chf007 <chf007server@163.com>",
   "license": "MIT",
