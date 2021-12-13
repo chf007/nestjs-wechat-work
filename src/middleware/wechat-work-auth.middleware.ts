@@ -26,6 +26,7 @@ export class WechatWorkAuthMiddleware implements NestMiddleware {
       tokenName = DEFAULT_TOKEN_NAME,
       tokenExpires = DEFAULT_TOKEN_EXPIRES,
       jwtSecret,
+      cookieHttpOnly = true,
     } = this.config.authConfig;
     const loginFailPathObj = queryString.parseUrl(loginFailPath);
 
@@ -91,40 +92,33 @@ export class WechatWorkAuthMiddleware implements NestMiddleware {
         const jwtToken = sign(userData, jwtSecret, {
           expiresIn: tokenExpires,
         });
+
+        const parsedPath = queryString.parseUrl(loginSuccessPath, { parseFragmentIdentifier: true });
+        // 可以在 loginPath 中加一个 _loginFrom 参数，在 loginSuccessPath 中附上该参数，loginSuccessPath 可以再跳转到 _loginFrom 的地址
+        // _loginFrom 可以是任意地址，loginSuccessPath 再跳要做好白名单控制
+        if (req.query._loginFrom) {
+          parsedPath.query._loginFrom = req.query._loginFrom;
+        }
         if (type === AuthType.COOKIE) {
           return res.cookie(tokenName, jwtToken, {
-            httpOnly: true,
+            httpOnly: cookieHttpOnly,
             secure: false,
             expires: new Date(Date.now() + tokenExpires * 1000),
-          }).redirect(loginSuccessPath);
+          }).redirect(queryString.stringifyUrl(parsedPath));
         } else if (type === AuthType.CALLBACK_TOKEN) {
-          const parsedPath = queryString.parseUrl(loginSuccessPath, { parseFragmentIdentifier: true });
-          return res.redirect(queryString.stringifyUrl({
-            url: parsedPath.url,
-            query: {
-              ...parsedPath.query,
-              [tokenName]: jwtToken,
-            },
-            fragmentIdentifier: parsedPath.fragmentIdentifier,
-          }));
+          parsedPath.query[tokenName] = jwtToken;
+          return res.redirect(queryString.stringifyUrl(parsedPath));
         }
       } else {
-        if (req.query.state) {
-          loginFailPathObj.query.result = AuthFailResult.UserRejectQrCode;
-          return res.redirect(queryString.stringifyUrl(loginFailPathObj));
-        } else {
-          return res.redirect(
-            `https://open.work.weixin.qq.com/wwopen/sso/qrConnect?appid=${corpId}&agentid=${agentId}&redirect_uri=${encodeURIComponent(
-              returnDomainName + loginPath,
-            )}&state=STATE`,
-          );
-        }
+        loginFailPathObj.query.result = req.query.state ? AuthFailResult.UserRejectQrCode : AuthFailResult.NoCode;
+        return res.redirect(queryString.stringifyUrl(loginFailPathObj));
       }
     } else if (req.baseUrl === logoutPath) {
+      // 如果当前请求是访问 logoutPath，则清空 cookie 然后跳转至 loginSuccessPath。
       if (type === AuthType.COOKIE) {
-        // 如果当前请求是访问 logoutPath，则清空 cookie 然后跳转至 loginSuccessPath。
         return res.clearCookie(tokenName).redirect(loginSuccessPath);
       }
+      // 其他类型 loginSuccessPath 自行处理
       return res.redirect(loginSuccessPath);
     } else {
       next();

@@ -69,7 +69,7 @@ import { WechatWorkModule } from 'nestjs-wechat-work';
         type: 'COOKIE', // auth 模式：COOKIE | CALLBACK_TOKEN，默认为 'COOKIE'
         returnDomainName: 'https://admin.xxx.com', // 扫码回跳域名 必填
         jwtSecret: 'adsadsad', // jwt secret 必填
-        loginPath: '/login', // 登陆处理
+        loginPath: '/login', // 登陆处理 可以在 loginPath 中加一个 _loginFrom 参数，在 loginSuccessPath 中附上该参数，loginSuccessPath 可以再跳转到 _loginFrom 的地址（_loginFrom 可以是任意地址，loginSuccessPath 要做好白名单控制）
         logoutPath: '/logout', // 登出处理
         loginSuccessPath: '/', // 登陆成功后跳转地址
         loginFailPath: '/login-fail.html', // 登陆失败后跳转地址，可以应用中自定义
@@ -79,6 +79,7 @@ import { WechatWorkModule } from 'nestjs-wechat-work';
         ],
         tokenName: '_token', // token cookie name
         tokenExpires: 3600 * 24 * 7, // token 过期秒数
+        cookieHttpOnly: true, // COOKIE 模式下是否对 cookie 启用 httpOnly 模式，默认是 true，为了安全建议设为 true
       },
     }),
   ],

@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.2.0] - 2021-12-13
+### Added
+- 新增 cookieHttpOnly 配置，默认为 true
+
+### Changed
+- 可以在 loginPath 中加一个 loginFrom 参数，在 loginSuccessPath 中附上该参数，loginSuccessPath 可以再跳转到 loginFrom 的地址（loginFrom 可以是任意地址，loginSuccessPath 要做好白名单控制）
+
 ## [1.1.0] - 2021-04-08
 ### Added
 - 除 cookie 模式以外，支持 callback_token 模式以适应前后端分离场景
