@@ -14,10 +14,10 @@ import {
 } from '../interfaces';
 import { WechatWorkBaseService } from './wechat-work-base.service';
 import {
-  WECHAT_WORK_MODULE_CONFIG,
   WECHAT_WORK_API_SERVER_HOST,
   WECHAT_WORK_MODULE_NAME,
 } from '../constants';
+import { MODULE_OPTIONS_TOKEN } from '../wechat-work.module-definition';
 
 @Injectable()
 export class WechatWorkContactsService {
@@ -25,7 +25,7 @@ export class WechatWorkContactsService {
   public apiServer = WECHAT_WORK_API_SERVER_HOST;
 
   constructor(
-    @Inject(WECHAT_WORK_MODULE_CONFIG)
+    @Inject(MODULE_OPTIONS_TOKEN)
     private readonly config: WechatWorkConfig,
     private readonly httpService: HttpService,
     private readonly wechatWorkBaseService: WechatWorkBaseService,

@@ -8,11 +8,8 @@ import {
 import * as cookie from 'cookie';
 import { verify } from 'jsonwebtoken';
 import { WechatWorkConfig } from '../interfaces';
-import {
-  DEFAULT_TOKEN_NAME,
-  WECHAT_WORK_MODULE_CONFIG,
-  wechatWorkQrCodePageUrl,
-} from '../constants';
+import { DEFAULT_TOKEN_NAME, wechatWorkQrCodePageUrl } from '../constants';
+import { MODULE_OPTIONS_TOKEN } from '../wechat-work.module-definition';
 
 interface JwtPayload {
   userId: string;
@@ -22,7 +19,7 @@ interface JwtPayload {
 export class WechatWorkAuthService {
   private readonly logger = new Logger(WechatWorkAuthService.name);
   constructor(
-    @Inject(WECHAT_WORK_MODULE_CONFIG)
+    @Inject(MODULE_OPTIONS_TOKEN)
     private readonly config: WechatWorkConfig,
   ) {}
 

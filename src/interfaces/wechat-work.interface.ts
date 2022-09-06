@@ -1,5 +1,3 @@
-import { ModuleMetadata, Type } from '@nestjs/common/interfaces';
-
 export interface AccessTokenInfo {
   getTime: number;
   expiresIn: number;
@@ -70,17 +68,7 @@ export interface AuthConfig {
   cookieHttpOnly?: boolean;
 }
 
-export class WechatWorkConfig {
+export interface WechatWorkConfig {
   baseConfig: BaseConfig;
   authConfig?: AuthConfig;
-}
-export interface WechatWorkConfigFactory {
-  createWechatWorkConfig(): Promise<WechatWorkConfig> | WechatWorkConfig;
-}
-
-export interface WechatWorkAsyncConfig extends Pick<ModuleMetadata, 'imports'> {
-  useExisting?: Type<WechatWorkConfigFactory>;
-  useClass?: Type<WechatWorkConfigFactory>;
-  useFactory?: (...args: any[]) => Promise<WechatWorkConfig> | WechatWorkConfig;
-  inject?: any[];
 }

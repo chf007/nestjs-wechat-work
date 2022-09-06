@@ -3,18 +3,15 @@ import { Request, Response } from 'express';
 import { sign } from 'jsonwebtoken';
 import * as queryString from 'query-string';
 import { WechatWorkBaseService, WechatWorkContactsService } from '../services';
-import {
-  DEFAULT_TOKEN_EXPIRES,
-  DEFAULT_TOKEN_NAME,
-  WECHAT_WORK_MODULE_CONFIG,
-} from '../constants';
+import { DEFAULT_TOKEN_EXPIRES, DEFAULT_TOKEN_NAME } from '../constants';
 import { AuthFailResult, AuthType, WechatWorkConfig } from '../interfaces';
 import { flatten, getPathById } from '../utils';
+import { MODULE_OPTIONS_TOKEN } from '../wechat-work.module-definition';
 
 @Injectable()
 export class WechatWorkAuthMiddleware implements NestMiddleware {
   constructor(
-    @Inject(WECHAT_WORK_MODULE_CONFIG)
+    @Inject(MODULE_OPTIONS_TOKEN)
     private readonly config: WechatWorkConfig,
     private readonly wechatWorkBaseService: WechatWorkBaseService,
     private readonly wechatWorkContactsService: WechatWorkContactsService,

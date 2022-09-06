@@ -11,6 +11,7 @@
 - 主版本号规则向 NestJS 主版号对齐
 - 使用 `ConfigurableModuleBuilder` 优化配置逻辑
 - tslint 换用 eslint
+- 默认为 global 模块
 
 ## [1.2.0] - 2021-12-13
 ### Added
