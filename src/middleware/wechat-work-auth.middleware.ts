@@ -3,14 +3,19 @@ import { Request, Response } from 'express';
 import { sign } from 'jsonwebtoken';
 import * as queryString from 'query-string';
 import { WechatWorkBaseService, WechatWorkContactsService } from '../services';
-import { DEFAULT_TOKEN_EXPIRES, DEFAULT_TOKEN_NAME, WECHAT_WORK_MODULE_CONFIG } from '../constants';
+import {
+  DEFAULT_TOKEN_EXPIRES,
+  DEFAULT_TOKEN_NAME,
+  WECHAT_WORK_MODULE_CONFIG,
+} from '../constants';
 import { AuthFailResult, AuthType, WechatWorkConfig } from '../interfaces';
 import { flatten, getPathById } from '../utils';
 
 @Injectable()
 export class WechatWorkAuthMiddleware implements NestMiddleware {
   constructor(
-    @Inject(WECHAT_WORK_MODULE_CONFIG) private readonly config: WechatWorkConfig,
+    @Inject(WECHAT_WORK_MODULE_CONFIG)
+    private readonly config: WechatWorkConfig,
     private readonly wechatWorkBaseService: WechatWorkBaseService,
     private readonly wechatWorkContactsService: WechatWorkContactsService,
   ) {}
@@ -67,7 +72,8 @@ export class WechatWorkAuthMiddleware implements NestMiddleware {
         const departmentDetail = [];
         let departmentInfoData;
         try {
-          departmentInfoData = await this.wechatWorkContactsService.getAllDepartmentList();
+          departmentInfoData =
+            await this.wechatWorkContactsService.getAllDepartmentList();
         } catch (err) {
           departmentInfoData = {};
         }
@@ -93,24 +99,30 @@ export class WechatWorkAuthMiddleware implements NestMiddleware {
           expiresIn: tokenExpires,
         });
 
-        const parsedPath = queryString.parseUrl(loginSuccessPath, { parseFragmentIdentifier: true });
+        const parsedPath = queryString.parseUrl(loginSuccessPath, {
+          parseFragmentIdentifier: true,
+        });
         // 可以在 loginPath 中加一个 _loginFrom 参数，在 loginSuccessPath 中附上该参数，loginSuccessPath 可以再跳转到 _loginFrom 的地址
         // _loginFrom 可以是任意地址，loginSuccessPath 再跳要做好白名单控制
         if (req.query._loginFrom) {
-          parsedPath.query._loginFrom = req.query._loginFrom;
+          parsedPath.query._loginFrom = req.query._loginFrom as string;
         }
         if (type === AuthType.COOKIE) {
-          return res.cookie(tokenName, jwtToken, {
-            httpOnly: cookieHttpOnly,
-            secure: false,
-            expires: new Date(Date.now() + tokenExpires * 1000),
-          }).redirect(queryString.stringifyUrl(parsedPath));
+          return res
+            .cookie(tokenName, jwtToken, {
+              httpOnly: cookieHttpOnly,
+              secure: false,
+              expires: new Date(Date.now() + tokenExpires * 1000),
+            })
+            .redirect(queryString.stringifyUrl(parsedPath));
         } else if (type === AuthType.CALLBACK_TOKEN) {
           parsedPath.query[tokenName] = jwtToken;
           return res.redirect(queryString.stringifyUrl(parsedPath));
         }
       } else {
-        loginFailPathObj.query.result = req.query.state ? AuthFailResult.UserRejectQrCode : AuthFailResult.NoCode;
+        loginFailPathObj.query.result = req.query.state
+          ? AuthFailResult.UserRejectQrCode
+          : AuthFailResult.NoCode;
         return res.redirect(queryString.stringifyUrl(loginFailPathObj));
       }
     } else if (req.baseUrl === logoutPath) {

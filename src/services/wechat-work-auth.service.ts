@@ -1,13 +1,26 @@
-import { HttpException, HttpStatus, Injectable, Logger, Inject } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Logger,
+  Inject,
+} from '@nestjs/common';
 import * as cookie from 'cookie';
 import { verify } from 'jsonwebtoken';
 import { WechatWorkConfig } from '../interfaces';
 import { DEFAULT_TOKEN_NAME, WECHAT_WORK_MODULE_CONFIG } from '../constants';
 
+interface JwtPayload {
+  userId: string;
+}
+
 @Injectable()
 export class WechatWorkAuthService {
   private readonly logger = new Logger(WechatWorkAuthService.name);
-  constructor(@Inject(WECHAT_WORK_MODULE_CONFIG) private readonly config: WechatWorkConfig) {}
+  constructor(
+    @Inject(WECHAT_WORK_MODULE_CONFIG)
+    private readonly config: WechatWorkConfig,
+  ) {}
 
   async validateContext(ctx: any): Promise<boolean> {
     // noRedirectPaths 开头的地址跳转控制权交给前端
@@ -72,7 +85,10 @@ export class WechatWorkAuthService {
    */
   async validateUserToken(token: string, ctx: any, isNoRedirectPath: boolean) {
     try {
-      const verifiedToken = verify(token, this.config.authConfig.jwtSecret);
+      const verifiedToken = verify(
+        token,
+        this.config.authConfig.jwtSecret,
+      ) as JwtPayload;
       if (!verifiedToken || !verifiedToken.userId) {
         if (isNoRedirectPath) {
           throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);

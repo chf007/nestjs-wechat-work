@@ -1,11 +1,11 @@
 import {
   Injectable,
   HttpException,
-  HttpService,
   HttpStatus,
   Logger,
   Inject,
 } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
 import {
   AccessTokenInfo,
   Result,
@@ -22,7 +22,8 @@ export class WechatWorkBaseService {
   public apiServer = 'https://qyapi.weixin.qq.com';
 
   constructor(
-    @Inject(WECHAT_WORK_MODULE_CONFIG) private readonly config: WechatWorkConfig,
+    @Inject(WECHAT_WORK_MODULE_CONFIG)
+    private readonly config: WechatWorkConfig,
     private readonly httpService: HttpService,
   ) {}
 
@@ -82,22 +83,16 @@ export class WechatWorkBaseService {
 
       const result = await this.httpService
         .get(
-          `${
-            this.apiServer
-          }/cgi-bin/gettoken?corpid=${corpId}&corpsecret=${secret}`,
+          `${this.apiServer}/cgi-bin/gettoken?corpid=${corpId}&corpsecret=${secret}`,
         )
         .toPromise();
 
       if (result.data.errcode) {
         this.logger.error(
-          `[getAccessToken] errcode: ${result.data.errcode}, errmsg: ${
-            result.data.errmsg
-          }`,
+          `[getAccessToken] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
         );
         throw new HttpException(
-          `[getAccessToken] errcode: ${result.data.errcode}, errmsg: ${
-            result.data.errmsg
-          }`,
+          `[getAccessToken] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
@@ -123,22 +118,16 @@ export class WechatWorkBaseService {
     const accessToken = await this.getAccessToken(AgentType.Custom);
     const result = await this.httpService
       .get(
-        `${
-          this.apiServer
-        }/cgi-bin/user/getuserinfo?access_token=${accessToken}&code=${code}`,
+        `${this.apiServer}/cgi-bin/user/getuserinfo?access_token=${accessToken}&code=${code}`,
       )
       .toPromise();
 
     if (result.data.errcode) {
       this.logger.error(
-        `[getUserId] errcode: ${result.data.errcode}, errmsg: ${
-          result.data.errmsg
-        }`,
+        `[getUserId] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
       );
       throw new HttpException(
-        `[getUserId] errcode: ${result.data.errcode}, errmsg: ${
-          result.data.errmsg
-        }`,
+        `[getUserId] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

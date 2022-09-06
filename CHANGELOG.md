@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+## [9.0.0] - 2022-09-06
+
+### Changed
+- 升级依赖
+- 换用 pnpm 管理依赖
+- 支持 NestJS V9
+- 主版本号规则向 NestJS 主版号对齐
+- 使用 `ConfigurableModuleBuilder` 优化配置逻辑
+- tslint 换用 eslint
+
 ## [1.2.0] - 2021-12-13
 ### Added
 - 新增 cookieHttpOnly 配置，默认为 true

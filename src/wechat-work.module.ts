@@ -1,18 +1,42 @@
-import { DynamicModule, Global, Module, HttpModule, MiddlewareConsumer, RequestMethod, Provider } from '@nestjs/common';
-import { WechatWorkBaseService, WechatWorkContactsService, WechatWorkAuthService } from './services';
+import {
+  DynamicModule,
+  Global,
+  Module,
+  MiddlewareConsumer,
+  Provider,
+} from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
+import {
+  WechatWorkBaseService,
+  WechatWorkContactsService,
+  WechatWorkAuthService,
+} from './services';
 import { WechatWorkAuthMiddleware } from './middleware';
-import { WechatWorkAsyncConfig, WechatWorkConfig, WechatWorkConfigFactory } from './interfaces';
+import {
+  WechatWorkAsyncConfig,
+  WechatWorkConfig,
+  WechatWorkConfigFactory,
+} from './interfaces';
 import { WECHAT_WORK_MODULE_CONFIG } from './constants';
 import { createWechatWorkConfigProvider } from './wechat-work.providers';
 
 @Global()
 @Module({
   imports: [HttpModule],
-  providers: [WechatWorkBaseService, WechatWorkContactsService, WechatWorkAuthService, WechatWorkConfig],
-  exports: [WechatWorkBaseService, WechatWorkContactsService, WechatWorkAuthService, WechatWorkConfig],
+  providers: [
+    WechatWorkBaseService,
+    WechatWorkContactsService,
+    WechatWorkAuthService,
+    WechatWorkConfig,
+  ],
+  exports: [
+    WechatWorkBaseService,
+    WechatWorkContactsService,
+    WechatWorkAuthService,
+    WechatWorkConfig,
+  ],
 })
 export class WechatWorkModule {
-
   constructor(private readonly config: WechatWorkConfig) {}
 
   static register(config: WechatWorkConfig): DynamicModule {
