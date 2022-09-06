@@ -1,13 +1,27 @@
-import { HttpException, HttpStatus, Injectable, Logger, Inject } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Logger,
+  Inject,
+} from '@nestjs/common';
 import * as cookie from 'cookie';
 import { verify } from 'jsonwebtoken';
 import { WechatWorkConfig } from '../interfaces';
-import { DEFAULT_TOKEN_NAME, WECHAT_WORK_MODULE_CONFIG } from '../constants';
+import { DEFAULT_TOKEN_NAME, wechatWorkQrCodePageUrl } from '../constants';
+import { MODULE_OPTIONS_TOKEN } from '../wechat-work.module-definition';
+
+interface JwtPayload {
+  userId: string;
+}
 
 @Injectable()
 export class WechatWorkAuthService {
   private readonly logger = new Logger(WechatWorkAuthService.name);
-  constructor(@Inject(WECHAT_WORK_MODULE_CONFIG) private readonly config: WechatWorkConfig) {}
+  constructor(
+    @Inject(MODULE_OPTIONS_TOKEN)
+    private readonly config: WechatWorkConfig,
+  ) {}
 
   async validateContext(ctx: any): Promise<boolean> {
     // noRedirectPaths 开头的地址跳转控制权交给前端
@@ -21,7 +35,7 @@ export class WechatWorkAuthService {
     }
 
     let token = '';
-    // 先从cookie中取token
+    // 先从 cookie 中取 token
     const tokenName = this.config.authConfig.tokenName || DEFAULT_TOKEN_NAME;
     const cookies = cookie.parse(ctx.req.headers.cookie || '');
     const tokenFromCookie = cookies[tokenName] || '';
@@ -29,7 +43,7 @@ export class WechatWorkAuthService {
     if (tokenFromCookie) {
       token = tokenFromCookie;
     } else {
-      // 如果cookie中没有token再从header中取authorization
+      // 如果 cookie 中没有 token 再从 header 中取 authorization
       const authorizationStr = ctx.req.headers && ctx.req.headers.authorization;
 
       if (!authorizationStr) {
@@ -72,7 +86,10 @@ export class WechatWorkAuthService {
    */
   async validateUserToken(token: string, ctx: any, isNoRedirectPath: boolean) {
     try {
-      const verifiedToken = verify(token, this.config.authConfig.jwtSecret);
+      const verifiedToken = verify(
+        token,
+        this.config.authConfig.jwtSecret,
+      ) as JwtPayload;
       if (!verifiedToken || !verifiedToken.userId) {
         if (isNoRedirectPath) {
           throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
@@ -94,9 +111,7 @@ export class WechatWorkAuthService {
     const { corpId, agentId } = this.config.baseConfig;
     const { returnDomainName, loginPath } = this.config.authConfig;
     ctx.redirect(
-      `https://open.work.weixin.qq.com/wwopen/sso/qrConnect?appid=${corpId}&agentid=${agentId}&redirect_uri=${encodeURIComponent(
-        returnDomainName + loginPath,
-      )}&state=STATE`,
+      wechatWorkQrCodePageUrl(corpId, agentId, returnDomainName, loginPath),
     );
   }
 }

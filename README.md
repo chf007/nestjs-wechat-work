@@ -96,10 +96,14 @@ export class AppModule {}
 ```
 // 导入 Module
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { WechatWorkModule } from 'nestjs-wechat-work';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     WechatWorkModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({

@@ -1,5 +1,3 @@
-import { ModuleMetadata, Type } from '@nestjs/common/interfaces';
-
 export interface AccessTokenInfo {
   getTime: number;
   expiresIn: number;
@@ -25,10 +23,10 @@ export enum AgentType {
 // 身份校验失败原因
 export enum AuthFailResult {
   UserRejectQrCode = 'UserRejectQrCode', // 用户扫码未通过
-  QueryUserIdFail = 'QueryUserIdFail', // 查询用户ID失败
+  QueryUserIdFail = 'QueryUserIdFail', // 查询用户 ID 失败
   QueryUserInfoFail = 'QueryUserInfoFail', // 查询用户信息失败
   UserInactive = 'UserInactive', // 当前用户被禁用或未激活
-  NoCode = 'NoCode', // 企业微信未返回code
+  NoCode = 'NoCode', // 企业微信未返回 code
 }
 
 export interface Result {
@@ -70,17 +68,7 @@ export interface AuthConfig {
   cookieHttpOnly?: boolean;
 }
 
-export class WechatWorkConfig {
+export interface WechatWorkConfig {
   baseConfig: BaseConfig;
   authConfig?: AuthConfig;
-}
-export interface WechatWorkConfigFactory {
-  createWechatWorkConfig(): Promise<WechatWorkConfig> | WechatWorkConfig;
-}
-
-export interface WechatWorkAsyncConfig extends Pick<ModuleMetadata, 'imports'> {
-  useExisting?: Type<WechatWorkConfigFactory>;
-  useClass?: Type<WechatWorkConfigFactory>;
-  useFactory?: (...args: any[]) => Promise<WechatWorkConfig> | WechatWorkConfig;
-  inject?: any[];
 }

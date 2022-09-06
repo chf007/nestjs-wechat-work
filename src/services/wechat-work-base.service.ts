@@ -1,11 +1,11 @@
 import {
   Injectable,
   HttpException,
-  HttpService,
   HttpStatus,
   Logger,
   Inject,
 } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
 import {
   AccessTokenInfo,
   Result,
@@ -13,16 +13,21 @@ import {
   AgentType,
   WechatWorkConfig,
 } from '../interfaces';
-import { WECHAT_WORK_MODULE_CONFIG } from '../constants';
+import {
+  WECHAT_WORK_API_SERVER_HOST,
+  WECHAT_WORK_MODULE_NAME,
+} from '../constants';
+import { MODULE_OPTIONS_TOKEN } from '../wechat-work.module-definition';
 
 @Injectable()
 export class WechatWorkBaseService {
   private readonly logger = new Logger(WechatWorkBaseService.name);
   private accessTokenInfo: AccessTokenInfo;
-  public apiServer = 'https://qyapi.weixin.qq.com';
+  public apiServer = WECHAT_WORK_API_SERVER_HOST;
 
   constructor(
-    @Inject(WECHAT_WORK_MODULE_CONFIG) private readonly config: WechatWorkConfig,
+    @Inject(MODULE_OPTIONS_TOKEN)
+    private readonly config: WechatWorkConfig,
     private readonly httpService: HttpService,
   ) {}
 
@@ -67,7 +72,7 @@ export class WechatWorkBaseService {
 
     if (!secret) {
       throw new HttpException(
-        `[getAccessToken] must be set agentType: ${agentType}'s secret`,
+        `[${WECHAT_WORK_MODULE_NAME}][getAccessToken] must be set agentType: ${agentType}'s secret`,
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -78,26 +83,20 @@ export class WechatWorkBaseService {
         Date.now() - this.accessTokenInfo.getTime >
           this.accessTokenInfo.expiresIn * 1000)
     ) {
-      this.logger.log(`[getAccessToken] use api`);
+      this.logger.log(`[${WECHAT_WORK_MODULE_NAME}][getAccessToken] use api`);
 
       const result = await this.httpService
         .get(
-          `${
-            this.apiServer
-          }/cgi-bin/gettoken?corpid=${corpId}&corpsecret=${secret}`,
+          `${this.apiServer}/cgi-bin/gettoken?corpid=${corpId}&corpsecret=${secret}`,
         )
         .toPromise();
 
       if (result.data.errcode) {
         this.logger.error(
-          `[getAccessToken] errcode: ${result.data.errcode}, errmsg: ${
-            result.data.errmsg
-          }`,
+          `[${WECHAT_WORK_MODULE_NAME}][getAccessToken] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
         );
         throw new HttpException(
-          `[getAccessToken] errcode: ${result.data.errcode}, errmsg: ${
-            result.data.errmsg
-          }`,
+          `[${WECHAT_WORK_MODULE_NAME}][getAccessToken] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
@@ -114,7 +113,9 @@ export class WechatWorkBaseService {
 
   async getUserId(code: string): Promise<Result & WechatWorkData> {
     if (!code) {
-      this.logger.log(`[getUserId] code cannot be empty`);
+      this.logger.log(
+        `[${WECHAT_WORK_MODULE_NAME}][getUserId] code cannot be empty`,
+      );
       throw new HttpException(
         '[getUserId] code cannot be empty',
         HttpStatus.BAD_REQUEST,
@@ -123,22 +124,16 @@ export class WechatWorkBaseService {
     const accessToken = await this.getAccessToken(AgentType.Custom);
     const result = await this.httpService
       .get(
-        `${
-          this.apiServer
-        }/cgi-bin/user/getuserinfo?access_token=${accessToken}&code=${code}`,
+        `${this.apiServer}/cgi-bin/user/getuserinfo?access_token=${accessToken}&code=${code}`,
       )
       .toPromise();
 
     if (result.data.errcode) {
       this.logger.error(
-        `[getUserId] errcode: ${result.data.errcode}, errmsg: ${
-          result.data.errmsg
-        }`,
+        `[${WECHAT_WORK_MODULE_NAME}][getUserId] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
       );
       throw new HttpException(
-        `[getUserId] errcode: ${result.data.errcode}, errmsg: ${
-          result.data.errmsg
-        }`,
+        `[getUserId] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
