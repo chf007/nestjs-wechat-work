@@ -36,7 +36,7 @@ export class WechatWorkAuthMiddleware implements NestMiddleware {
     const loginFailPathObj = queryString.parseUrl(loginFailPath);
 
     if (req.baseUrl === loginPath) {
-      // 如果当前请求是访问 loginPath，如传入code则校验企业微信用户信息如正确则生成jwt token，写入cookie，然后跳转至 loginSuccessPath，如失败则跳至 loginFailPath；如直接访问，则直接跳转至企业微信扫码页。
+      // 如果当前请求是访问 loginPath，如传入 code 则校验企业微信用户信息如正确则生成 jwt token，写入 cookie，然后跳转至 loginSuccessPath，如失败则跳至 loginFailPath；如直接访问，则直接跳转至企业微信扫码页。
       if (req.query.code) {
         let userIdData;
         try {
@@ -85,7 +85,7 @@ export class WechatWorkAuthMiddleware implements NestMiddleware {
           }
         }
 
-        // 注意有些字段仅通讯录secret能取到
+        // 注意有些字段仅通讯录 secret 能取到
         const userData = {
           userId: userIdData.UserId,
           name: userInfoData.name,

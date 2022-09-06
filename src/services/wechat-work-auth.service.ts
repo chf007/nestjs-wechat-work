@@ -8,7 +8,11 @@ import {
 import * as cookie from 'cookie';
 import { verify } from 'jsonwebtoken';
 import { WechatWorkConfig } from '../interfaces';
-import { DEFAULT_TOKEN_NAME, WECHAT_WORK_MODULE_CONFIG } from '../constants';
+import {
+  DEFAULT_TOKEN_NAME,
+  WECHAT_WORK_MODULE_CONFIG,
+  wechatWorkQrCodePageUrl,
+} from '../constants';
 
 interface JwtPayload {
   userId: string;
@@ -34,7 +38,7 @@ export class WechatWorkAuthService {
     }
 
     let token = '';
-    // 先从cookie中取token
+    // 先从 cookie 中取 token
     const tokenName = this.config.authConfig.tokenName || DEFAULT_TOKEN_NAME;
     const cookies = cookie.parse(ctx.req.headers.cookie || '');
     const tokenFromCookie = cookies[tokenName] || '';
@@ -42,7 +46,7 @@ export class WechatWorkAuthService {
     if (tokenFromCookie) {
       token = tokenFromCookie;
     } else {
-      // 如果cookie中没有token再从header中取authorization
+      // 如果 cookie 中没有 token 再从 header 中取 authorization
       const authorizationStr = ctx.req.headers && ctx.req.headers.authorization;
 
       if (!authorizationStr) {
@@ -110,9 +114,7 @@ export class WechatWorkAuthService {
     const { corpId, agentId } = this.config.baseConfig;
     const { returnDomainName, loginPath } = this.config.authConfig;
     ctx.redirect(
-      `https://open.work.weixin.qq.com/wwopen/sso/qrConnect?appid=${corpId}&agentid=${agentId}&redirect_uri=${encodeURIComponent(
-        returnDomainName + loginPath,
-      )}&state=STATE`,
+      wechatWorkQrCodePageUrl(corpId, agentId, returnDomainName, loginPath),
     );
   }
 }

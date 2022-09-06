@@ -25,10 +25,10 @@ export enum AgentType {
 // 身份校验失败原因
 export enum AuthFailResult {
   UserRejectQrCode = 'UserRejectQrCode', // 用户扫码未通过
-  QueryUserIdFail = 'QueryUserIdFail', // 查询用户ID失败
+  QueryUserIdFail = 'QueryUserIdFail', // 查询用户 ID 失败
   QueryUserInfoFail = 'QueryUserInfoFail', // 查询用户信息失败
   UserInactive = 'UserInactive', // 当前用户被禁用或未激活
-  NoCode = 'NoCode', // 企业微信未返回code
+  NoCode = 'NoCode', // 企业微信未返回 code
 }
 
 export interface Result {

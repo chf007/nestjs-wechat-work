@@ -13,13 +13,17 @@ import {
   AgentType,
   WechatWorkConfig,
 } from '../interfaces';
-import { WECHAT_WORK_MODULE_CONFIG } from '../constants';
+import {
+  WECHAT_WORK_MODULE_CONFIG,
+  WECHAT_WORK_API_SERVER_HOST,
+  WECHAT_WORK_MODULE_NAME,
+} from '../constants';
 
 @Injectable()
 export class WechatWorkBaseService {
   private readonly logger = new Logger(WechatWorkBaseService.name);
   private accessTokenInfo: AccessTokenInfo;
-  public apiServer = 'https://qyapi.weixin.qq.com';
+  public apiServer = WECHAT_WORK_API_SERVER_HOST;
 
   constructor(
     @Inject(WECHAT_WORK_MODULE_CONFIG)
@@ -68,7 +72,7 @@ export class WechatWorkBaseService {
 
     if (!secret) {
       throw new HttpException(
-        `[getAccessToken] must be set agentType: ${agentType}'s secret`,
+        `[${WECHAT_WORK_MODULE_NAME}][getAccessToken] must be set agentType: ${agentType}'s secret`,
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -79,7 +83,7 @@ export class WechatWorkBaseService {
         Date.now() - this.accessTokenInfo.getTime >
           this.accessTokenInfo.expiresIn * 1000)
     ) {
-      this.logger.log(`[getAccessToken] use api`);
+      this.logger.log(`[${WECHAT_WORK_MODULE_NAME}][getAccessToken] use api`);
 
       const result = await this.httpService
         .get(
@@ -89,10 +93,10 @@ export class WechatWorkBaseService {
 
       if (result.data.errcode) {
         this.logger.error(
-          `[getAccessToken] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
+          `[${WECHAT_WORK_MODULE_NAME}][getAccessToken] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
         );
         throw new HttpException(
-          `[getAccessToken] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
+          `[${WECHAT_WORK_MODULE_NAME}][getAccessToken] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
@@ -109,7 +113,9 @@ export class WechatWorkBaseService {
 
   async getUserId(code: string): Promise<Result & WechatWorkData> {
     if (!code) {
-      this.logger.log(`[getUserId] code cannot be empty`);
+      this.logger.log(
+        `[${WECHAT_WORK_MODULE_NAME}][getUserId] code cannot be empty`,
+      );
       throw new HttpException(
         '[getUserId] code cannot be empty',
         HttpStatus.BAD_REQUEST,
@@ -124,7 +130,7 @@ export class WechatWorkBaseService {
 
     if (result.data.errcode) {
       this.logger.error(
-        `[getUserId] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
+        `[${WECHAT_WORK_MODULE_NAME}][getUserId] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
       );
       throw new HttpException(
         `[getUserId] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,

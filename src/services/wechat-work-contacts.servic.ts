@@ -13,12 +13,16 @@ import {
   WechatWorkConfig,
 } from '../interfaces';
 import { WechatWorkBaseService } from './wechat-work-base.service';
-import { WECHAT_WORK_MODULE_CONFIG } from '../constants';
+import {
+  WECHAT_WORK_MODULE_CONFIG,
+  WECHAT_WORK_API_SERVER_HOST,
+  WECHAT_WORK_MODULE_NAME,
+} from '../constants';
 
 @Injectable()
 export class WechatWorkContactsService {
   private readonly logger = new Logger(WechatWorkContactsService.name);
-  public apiServer = 'https://qyapi.weixin.qq.com';
+  public apiServer = WECHAT_WORK_API_SERVER_HOST;
 
   constructor(
     @Inject(WECHAT_WORK_MODULE_CONFIG)
@@ -30,7 +34,9 @@ export class WechatWorkContactsService {
   // 读取成员
   async getUserInfo(userId: string): Promise<Result & WechatWorkData> {
     if (!userId) {
-      this.logger.log(`[getUserInfo] userId cannot be empty`);
+      this.logger.log(
+        `[${WECHAT_WORK_MODULE_NAME}][getUserInfo] userId cannot be empty`,
+      );
       throw new HttpException(
         '[getUserInfo] userId cannot be empty',
         HttpStatus.BAD_REQUEST,
@@ -47,7 +53,7 @@ export class WechatWorkContactsService {
 
     if (result.data.errcode) {
       this.logger.error(
-        `[getUserInfo] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
+        `[${WECHAT_WORK_MODULE_NAME}][getUserInfo] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
       );
       throw new HttpException(
         `[getUserInfo] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
@@ -74,7 +80,7 @@ export class WechatWorkContactsService {
 
     if (result.data.errcode) {
       this.logger.error(
-        `[getSimpleUserList] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
+        `[${WECHAT_WORK_MODULE_NAME}][getSimpleUserList] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
       );
       throw new HttpException(
         `[getSimpleUserList] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
@@ -101,7 +107,7 @@ export class WechatWorkContactsService {
 
     if (result.data.errcode) {
       this.logger.error(
-        `[getUserList] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
+        `[${WECHAT_WORK_MODULE_NAME}][getUserList] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
       );
       throw new HttpException(
         `[getUserList] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
@@ -115,7 +121,9 @@ export class WechatWorkContactsService {
   // 获取部门列表
   async getDepartmentList(id: number): Promise<Result & WechatWorkData> {
     if (!id) {
-      this.logger.log(`[getDepartmentList] userId cannot be empty`);
+      this.logger.log(
+        `[${WECHAT_WORK_MODULE_NAME}][getDepartmentList] userId cannot be empty`,
+      );
       throw new HttpException(
         '[getDepartmentList] userId cannot be empty',
         HttpStatus.BAD_REQUEST,
@@ -132,7 +140,7 @@ export class WechatWorkContactsService {
 
     if (result.data.errcode) {
       this.logger.error(
-        `[getDepartmentList] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
+        `[${WECHAT_WORK_MODULE_NAME}][getDepartmentList] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
       );
       throw new HttpException(
         `[getDepartmentList] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
@@ -156,7 +164,7 @@ export class WechatWorkContactsService {
 
     if (result.data.errcode) {
       this.logger.error(
-        `[getAllDepartmentList] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
+        `[${WECHAT_WORK_MODULE_NAME}][getAllDepartmentList] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
       );
       throw new HttpException(
         `[getAllDepartmentList] errcode: ${result.data.errcode}, errmsg: ${result.data.errmsg}`,
